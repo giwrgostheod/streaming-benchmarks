@@ -15,17 +15,17 @@ KAFKA_VERSION=${KAFKA_VERSION:-"0.8.2.1"}
 REDIS_VERSION=${REDIS_VERSION:-"3.0.5"}
 SCALA_BIN_VERSION=${SCALA_BIN_VERSION:-"2.10"}
 SCALA_SUB_VERSION=${SCALA_SUB_VERSION:-"4"}
-STORM_VERSION=${STORM_VERSION:-"0.9.7"}
-FLINK_VERSION=${FLINK_VERSION:-"1.1.3"}
-SPARK_VERSION=${SPARK_VERSION:-"1.6.2"}
-APEX_VERSION=${APEX_VERSION:-"3.4.0"}
+STORM_VERSION=${STORM_VERSION:-"0.10.2"}
+FLINK_VERSION=${FLINK_VERSION:-"1.1.5"}
+SPARK_VERSION=${SPARK_VERSION:-"1.6.3"}
+APEX_VERSION=${APEX_VERSION:-"3.5.0"}
 
 STORM_DIR="apache-storm-$STORM_VERSION"
 REDIS_DIR="redis-$REDIS_VERSION"
 KAFKA_DIR="kafka_$SCALA_BIN_VERSION-$KAFKA_VERSION"
 FLINK_DIR="flink-$FLINK_VERSION"
 SPARK_DIR="spark-$SPARK_VERSION-bin-hadoop2.6"
-APEX_DIR="apex-$APEX_VERSION"
+APEX_DIR="apache-apex-core-$APEX_VERSION"
 
 #Get one of the closet apache mirrors
 APACHE_MIRROR=$(curl 'https://www.apache.org/dyn/closer.cgi' |   grep -o '<strong>[^<]*</strong>' |   sed 's/<[^>]*>//g' |   head -1)
@@ -149,14 +149,14 @@ run() {
 
     #Fetch Apex
     APEX_FILE="$APEX_DIR.tgz.gz"
-    fetch_untar_file "$APEX_FILE" "$APACHE_MIRROR/apex/apache-apex-core-$APEX_VERSION/apex-$APEX_VERSION-source-release.tar.gz"
+    fetch_untar_file "$APEX_FILE" "$APACHE_MIRROR/apex/apache-apex-core-$APEX_VERSION/apache-apex-core-$APEX_VERSION-source-release.tar.gz"
     cd $APEX_DIR
     $MVN clean install -DskipTests
     cd ..
 
     #Fetch Kafka
     KAFKA_FILE="$KAFKA_DIR.tgz"
-    fetch_untar_file "$KAFKA_FILE" "$APACHE_MIRROR/kafka/$KAFKA_VERSION/$KAFKA_FILE"
+    fetch_untar_file "$KAFKA_FILE" "http://archive.apache.org/dist/kafka/$KAFKA_VERSION/$KAFKA_FILE"
 
     #Fetch Storm
     STORM_FILE="$STORM_DIR.tar.gz"
@@ -202,7 +202,7 @@ run() {
     stop_if_needed daemon.name=logviewer "Storm LogViewer"
   elif [ "START_KAFKA" = "$OPERATION" ];
   then
-    start_if_needed kafka\.Kafka Kafka 10 "$KAFKA_DIR/bin/kafka-server-start.sh" "$KAFKA_DIR/config/server.properties"
+        start_if_needed kafka\.Kafka Kafka 10 "$KAFKA_DIR/bin/kafka-server-start.sh" "$KAFKA_DIR/config/server.properties"
     create_kafka_topic
   elif [ "STOP_KAFKA" = "$OPERATION" ];
   then
@@ -216,6 +216,7 @@ run() {
     $FLINK_DIR/bin/stop-local.sh
   elif [ "START_SPARK" = "$OPERATION" ];
   then
+    export SPARK_LOCAL_IP=127.0.0.1
     start_if_needed org.apache.spark.deploy.master.Master SparkMaster 5 $SPARK_DIR/sbin/start-master.sh -h localhost -p 7077
     start_if_needed org.apache.spark.deploy.worker.Worker SparkSlave 5 $SPARK_DIR/sbin/start-slave.sh spark://localhost:7077
   elif [ "STOP_SPARK" = "$OPERATION" ];
@@ -244,6 +245,7 @@ run() {
     sleep 10
   elif [ "START_SPARK_PROCESSING" = "$OPERATION" ];
   then
+    export SPARK_LOCAL_IP=127.0.0.1
     "$SPARK_DIR/bin/spark-submit" --master spark://localhost:7077 --class spark.benchmark.KafkaRedisAdvertisingStream ./spark-benchmarks/target/spark-benchmarks-0.1.0.jar "$CONF_FILE" &
     sleep 5
   elif [ "STOP_SPARK_PROCESSING" = "$OPERATION" ];
