@@ -6,7 +6,7 @@ import uk.ac.ic.imperial.benchmark.utils.SSHUtils
 import scala.sys.process._
 
 /**
-  * Class for managing Apache Kafka on a generic cluster. Currently supports one broker per instance.
+  * Class for managing Apache Kafka on a **generic** cluster. Currently supports one broker per instance.
   * Will install Zookeeper on a single node, colocated with the first broker.
   * Please do not use this code in production.
   *
@@ -29,7 +29,6 @@ class LocalKafka(
     val executors = sc.getExecutorMemoryStatus.keys.map(_.split(":").head).toSet
     if (executors.size == 1) {
       // just the driver
-      println("My Ip  is: "+ myIp)
       List(myIp)
     } else {
       (executors - myIp).toList
@@ -48,7 +47,7 @@ class LocalKafka(
   private lazy val zookeeper = workers(0)
   lazy val kafkaNodesString = kafkaNodes.map(_ + ":9092").mkString(",")
   lazy val zookeeperAddress = zookeeper + ":2181"
-  private val dbfsDir = "home/streaming/benchmark"
+  private val dbfsDir = "streaming/benchmark"
 
   def init(): Unit = {
     generateSshKeys()
@@ -66,13 +65,13 @@ class LocalKafka(
     */
 
     workers.foreach { ip =>
-      ssh(ip, s"bash /dbfs/$dbfsDir/install-kafka.sh")
+      ssh(ip, s"bash /tmp/$dbfsDir/install-kafka.sh")
     }
 
     ssh(zookeeper, s"kafka/bin/zookeeper-server-start.sh -daemon kafka/config/zookeeper.properties")
 
     kafkaNodes.zipWithIndex.foreach { case (host, id) =>
-      ssh(host, s"bash /dbfs/$dbfsDir/configure-kafka.sh $zookeeper $id $host")
+      ssh(host, s"bash /tmp/$dbfsDir/configure-kafka.sh $zookeeper $id $host")
       ssh(host, s"kafka/bin/kafka-server-start.sh -daemon kafka/config/server.properties")
     }
 
@@ -99,6 +98,18 @@ class LocalKafka(
       case e: RuntimeException =>
     }
   }
+
+  /**
+    * Stop Kafka cluster (and Zookeeper)
+    */
+  def stopAll(): Unit ={
+    kafkaNodes.foreach { ip =>
+      ssh(ip, s"kafka/bin/kafka-server-stop.sh")
+    }
+    Thread.sleep(5 * 1000) // wait for Kafka to tear down
+    ssh(zookeeper, s"kafka/bin/zookeeper-server-stop.sh")
+  }
+
 }
 
 object LocalKafka extends Serializable {
@@ -107,7 +118,7 @@ object LocalKafka extends Serializable {
   def setup(spark: SparkSession, numKafkaNodes: Int = 1, stopSparkOnKafkaNodes: Boolean = false): LocalKafka = {
     if (cluster == null) {
       cluster = new LocalKafka(spark, numKafkaNodes, stopSparkOnKafkaNodes)
-//      cluster.setup()
+      cluster.setup()
     }
     cluster
   }
@@ -123,9 +134,9 @@ object LocalKafka extends Serializable {
   }
 
   private def writeInstallFile(dbfsDir: String, kafkaVersion: String): Unit = {
-    Seq("mkdir", "-p", s"/dbfs/$dbfsDir").!!
-    writeFile(s"/dbfs/$dbfsDir/install-kafka.sh", getInstallKafkaScript(dbfsDir, kafkaVersion))
-    writeFile(s"/dbfs/$dbfsDir/configure-kafka.sh", configureKafkaScript)
+    Seq("mkdir", "-p", s"/tmp/$dbfsDir").!!
+    writeFile(s"/tmp/$dbfsDir/install-kafka.sh", getInstallKafkaScript(dbfsDir, kafkaVersion))
+    writeFile(s"/tmp/$dbfsDir/configure-kafka.sh", configureKafkaScript)
   }
 
   /** Script that can be run on executors to install Kafka. */
@@ -134,10 +145,10 @@ object LocalKafka extends Serializable {
        |set -e
        |
        |mkdir -p kafka && cd kafka
-       |if [ ! -r "/dbfs/$dbfsDir/kafka-${kafkaVersion}.tgz" ]; then
-       | wget -O /dbfs/$dbfsDir/kafka-${kafkaVersion}.tgz "http://mirrors.advancedhosters.com/apache/kafka/${kafkaVersion}/kafka_2.11-${kafkaVersion}.tgz"
+       |if [ ! -r "/tmp/$dbfsDir/kafka-${kafkaVersion}.tgz" ]; then
+       | wget -O /tmp/$dbfsDir/kafka-${kafkaVersion}.tgz "http://mirrors.advancedhosters.com/apache/kafka/${kafkaVersion}/kafka_2.11-${kafkaVersion}.tgz"
        |fi
-       |tar -xvzf /dbfs/$dbfsDir/kafka-${kafkaVersion}.tgz --strip 1 1> /dev/null 2>&1
+       |tar -xvzf /tmp/$dbfsDir/kafka-${kafkaVersion}.tgz --strip 1 1> /dev/null 2>&1
      """.stripMargin
   }
 

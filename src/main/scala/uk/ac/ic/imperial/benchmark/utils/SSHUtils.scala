@@ -28,7 +28,7 @@ trait SSHUtils {
     * Ssh into the given `host` and execute `command`.
     */
   def ssh(host: String, command: String, logStdout: Boolean = true): String = {
-    println("executing command - " + command + " on host: " + host)
+    println("executing command - " + command + " -> Host: " + host)
     val outBuffer = new collection.mutable.ArrayBuffer[String]()
     val logger = ProcessLogger(line => outBuffer += line, println(_))
 
@@ -38,10 +38,10 @@ trait SSHUtils {
       outBuffer.foreach(println)
     }
     if (exitCode != 0) {
-      println(s"FAILED: command - $command on host: $host")
+      println(s"FAILED: command - $command -> Host: $host")
       sys.error("Command failed")
     }
-    println(s"SUCCESS: command - $command on host: $host")
+    println(s"SUCCESS: command - $command -> Host: $host")
     outBuffer.mkString("\n")
   }
 

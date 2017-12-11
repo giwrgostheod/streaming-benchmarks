@@ -4,7 +4,12 @@ import uk.ac.ic.imperial.benchmark.spark.{LocalKafka, SparkHelper, SparkYahooRun
 import uk.ac.ic.imperial.benchmark.yahoo.YahooBenchmark
 
 /**
-  * Hello world!
+  * Streaming benchmark Main entry point
+  *
+  * Goals of the benchmark
+  *   * Explore different streaming systems
+  *   * Discover bottlenecks and potential solutions
+  *   * Explore system scalability
   *
   */
 object SparkMainBench {
@@ -21,7 +26,7 @@ object SparkMainBench {
   //////////////////////////////////
   // Event Generation
   //////////////////////////////////
-  val recordsPerSecond = 100000
+  val recordsPerSecond = 5000000
   val rampUpTimeSeconds = 10 // Ramps up event generation to the specified rate for the given duration to allow the JVM to warm up
   val recordGenerationParallelism = 1 // Parallelism within Spark to generate data for the Kafka Streams benchmark
 
@@ -61,7 +66,7 @@ object SparkMainBench {
 
   def main(args: Array[String]): Unit = {
 
-    val spark = SparkHelper.getAndConfigure SparkSession()
+    val spark = SparkHelper.getAndConfigureSparkSession()
     val kafkaCluster = LocalKafka.setup(spark, stopSparkOnKafkaNodes = stopSparkOnKafkaNodes, numKafkaNodes = numKafkaNodes)
 
     val benchmark = new YahooBenchmark(
@@ -83,6 +88,6 @@ object SparkMainBench {
 
     benchmark.run(sparkRunner, s"$benchmarkResultsBase/spark", numRuns = numTrials)
 
-
+    kafkaCluster.stopAll()
   }
 }

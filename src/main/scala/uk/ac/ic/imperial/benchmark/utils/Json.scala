@@ -7,7 +7,7 @@ import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import scala.reflect._
 
 /**
-  * Utility functions for Json munging using Jackson. We use spray for Flink as there is a Jackson version incompatiblity between
+  * Utility functions for Json munging using Jackson. We use spray for Flink as there is a Jackson version incompatibility between
   * Spark's and Flink's jackson versions. Our tests did not show any significant performance degradation using one over the other.
   */
 object Json {
