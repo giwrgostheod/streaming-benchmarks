@@ -46,7 +46,11 @@ class SparkYahooRunner(
     startTime = 0L
     endTime = 0L
     numRecs = 0L
-    Thread.sleep(1000000000L)
+    try {
+      Thread.sleep(1000000000L)
+    } catch {
+      case e: InterruptedException => Thread.currentThread().interrupt() // set interrupt flag
+    }
   }
 
   override def generateData(

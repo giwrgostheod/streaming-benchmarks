@@ -60,7 +60,7 @@ trait Benchmark[Runner <: YahooBenchmarkRunner] {
     this.runner = runner
 //    dbutils.fs.put(outputPath.stripSuffix("/") + "/_parameters",
 //      allParams.map { case (key, value) => s"$key: $value" }.mkString("\n"), overwrite = true)
-    println(allParams)
+    println("Configuration "+allParams)
     for (i <- 1 to numRuns) {
       timeIt(s"run $i") {
         runOnce(i, outputPath)
