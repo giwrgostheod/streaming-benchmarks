@@ -58,9 +58,9 @@ trait Benchmark[Runner <: YahooBenchmarkRunner] {
 
   final def run(runner: Runner, outputPath: String, numRuns: Int = 10): Unit = {
     this.runner = runner
-//    dbutils.fs.put(outputPath.stripSuffix("/") + "/_parameters",
-//      allParams.map { case (key, value) => s"$key: $value" }.mkString("\n"), overwrite = true)
-    println("Configuration "+allParams)
+    //    dbutils.fs.put(outputPath.stripSuffix("/") + "/_parameters",
+    //      allParams.map { case (key, value) => s"$key: $value" }.mkString("\n"), overwrite = true)
+    println("Configuration " + allParams)
     for (i <- 1 to numRuns) {
       timeIt(s"run $i") {
         runOnce(i, outputPath)

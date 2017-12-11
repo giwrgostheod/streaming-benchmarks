@@ -25,7 +25,7 @@ case class Output(
 
 /** Event data after a projection */
 case class ProjectedEvent(
-                           ad_id: String,           // UUID
+                           ad_id: String, // UUID
                            event_time: java.sql.Timestamp) {
   def this() = this(null, new java.sql.Timestamp(0L))
 }

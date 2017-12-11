@@ -55,8 +55,8 @@ trait SSHUtils {
 
   /** Generate new ssh keys if required. */
   protected def generateSshKeys(): Unit = {
-//    if ("ls /root/.ssh/id_rsa".! > 0) {
-//      Seq("ssh-keygen", "-t" , "rsa", "-N", "", "-f", "/root/.ssh/id_rsa").!!
-//    }
+    //    if ("ls /root/.ssh/id_rsa".! > 0) {
+    //      Seq("ssh-keygen", "-t" , "rsa", "-N", "", "-f", "/root/.ssh/id_rsa").!!
+    //    }
   }
 }

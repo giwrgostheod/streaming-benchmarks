@@ -1,18 +1,19 @@
 package uk.ac.ic.imperial
 
-import uk.ac.ic.imperial.benchmark.spark.{LocalKafka, SparkHelper, SparkYahooRunner}
+import uk.ac.ic.imperial.benchmark.spark.{SparkHelper, SparkYahooRunner}
+import uk.ac.ic.imperial.benchmark.utils.LocalKafka
 import uk.ac.ic.imperial.benchmark.yahoo.YahooBenchmark
 
 /**
   * Streaming benchmark Main entry point
   *
-  * Goals of the benchmark
-  *   * Explore different streaming systems
-  *   * Discover bottlenecks and potential solutions
-  *   * Explore system scalability
+  *   Goals of the benchmark:
+  *     * Explore different streaming systems
+  *     * Discover bottlenecks and potential solutions
+  *     * Explore system scalability
   *
   */
-object SparkMainBench {
+object StreamBenchMain {
   // Benchmark Configurations - Ideal for Community Edititon
   val stopSparkOnKafkaNodes = false
   val stopSparkOnFlinkNodes = false

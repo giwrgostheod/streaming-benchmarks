@@ -1,9 +1,9 @@
 package uk.ac.ic.imperial.benchmark.spark
 
-import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.functions.{max, _}
+import uk.ac.ic.imperial.benchmark.utils.LocalKafka
 import uk.ac.ic.imperial.benchmark.yahoo.YahooBenchmarkRunner
-import org.apache.spark.sql.functions.{min, max}
 
 /**
   * Runner for the Yahoo Benchmark using Apache Spark.
@@ -15,11 +15,10 @@ class SparkYahooRunner(
 
   require(parallelism >= 1, "Parallelism can't be less than 1")
 
-  import uk.ac.ic.imperial.benchmark.yahoo._
-
   import org.apache.spark.sql._
   import org.apache.spark.sql.streaming._
   import StreamingQueryListener._
+  import uk.ac.ic.imperial.benchmark.yahoo._
 
   private var stream: StreamingQuery = _
   @volatile private var numRecs: Long = 0L
@@ -30,9 +29,11 @@ class SparkYahooRunner(
     override def onQueryStarted(event: QueryStartedEvent): Unit = {
       startTime = System.currentTimeMillis
     }
+
     override def onQueryTerminated(event: QueryTerminatedEvent): Unit = {
       endTime = System.currentTimeMillis
     }
+
     override def onQueryProgress(event: QueryProgressEvent): Unit = {
       numRecs += event.progress.numInputRows
     }
@@ -58,8 +59,8 @@ class SparkYahooRunner(
                              tuplesPerSecond: Long,
                              recordGenParallelism: Int,
                              rampUpTimeSeconds: Int): Unit = {
-    import spark.sqlContext.implicits._
     import spark.sql
+    import spark.sqlContext.implicits._
 
     val sc = spark.sparkContext
     sc.setLocalProperty("spark.scheduler.pool", "yahoo-benchmark")
@@ -116,8 +117,8 @@ class SparkYahooRunner(
     * pair and the event timestamp of the latest record generated that belongs to that bucket.
     */
   override def getLatency(): DataFrame = {
-    import org.apache.spark.sql.types._
     import org.apache.spark.sql.functions._
+    import org.apache.spark.sql.types._
     import spark.implicits._
 
     val schema = YahooBenchmark.outputSchema.add("lastUpdate", TimestampType)

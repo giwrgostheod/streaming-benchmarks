@@ -2,23 +2,24 @@ package uk.ac.ic.imperial.benchmark.yahoo
 
 import java.util.UUID
 
-import org.apache.spark.sql.{DataFrame, Encoders, SparkSession}
+import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.types._
-import uk.ac.ic.imperial.benchmark.spark.LocalKafka
+import uk.ac.ic.imperial.benchmark.utils.LocalKafka
 
 /**
   * Benchmark for measuring throughput and latency. Details available at:
   * [[https://yahooeng.tumblr.com/post/135321837876/benchmarking-streaming-computation-engines-at]].
   */
-class YahooBenchmark( override val spark: SparkSession,
-                      kafkaCluster: LocalKafka,
-                      override val tuplesPerSecond: Long,
-                      override val recordGenParallelism: Int,
-                      override val rampUpTimeSeconds: Int,
-                      kafkaEventsTopicPartitions: Int = 1,
-                      kafkaOutputTopicPartitions: Int = 1,
-                      numCampaigns: Int = 100,
-                      override val readerWaitTimeMs: Long = 300000) extends Benchmark[YahooBenchmarkRunner] {
+class YahooBenchmark(override val spark: SparkSession,
+                     kafkaCluster: LocalKafka,
+                     override val tuplesPerSecond: Long,
+                     override val recordGenParallelism: Int,
+                     override val rampUpTimeSeconds: Int,
+                     kafkaEventsTopicPartitions: Int = 1,
+                     kafkaOutputTopicPartitions: Int = 1,
+                     numCampaigns: Int = 100,
+                     override val readerWaitTimeMs: Long = 300000) extends Benchmark[YahooBenchmarkRunner] {
+
   import spark.implicits._
 
   override val benchmarkParams: Map[String, Any] = Map(
@@ -65,22 +66,22 @@ object YahooBenchmark {
     .add("time_window", LongType)
     .add("campaign_id", StringType)
     .add("count", LongType)
-//
-//  def getBenchmarkResults(outputPath: String): DataFrame = {
-//    val df = spark.read.json(outputPath)
-//      .select(
-//        'trial,
-//        'start,
-//        'end,
-//        'totalDurationMillis,
-//        'totalInput as 'recordsProcessed,
-//        'throughput,
-//        'latency_min,
-//        'latency_95,
-//        'latency_99,
-//        'latency_max,
-//        'latency_avg)
-//    display(df.orderBy('trial))
-//    df
-//  }
+  //
+  //  def getBenchmarkResults(outputPath: String): DataFrame = {
+  //    val df = spark.read.json(outputPath)
+  //      .select(
+  //        'trial,
+  //        'start,
+  //        'end,
+  //        'totalDurationMillis,
+  //        'totalInput as 'recordsProcessed,
+  //        'throughput,
+  //        'latency_min,
+  //        'latency_95,
+  //        'latency_99,
+  //        'latency_max,
+  //        'latency_avg)
+  //    display(df.orderBy('trial))
+  //    df
+  //  }
 }

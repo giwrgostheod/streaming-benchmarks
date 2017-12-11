@@ -1,7 +1,6 @@
-package uk.ac.ic.imperial.benchmark.spark
+package uk.ac.ic.imperial.benchmark.utils
 
 import org.apache.spark.sql._
-import uk.ac.ic.imperial.benchmark.utils.SSHUtils
 
 import scala.sys.process._
 
@@ -102,7 +101,7 @@ class LocalKafka(
   /**
     * Stop Kafka cluster (and Zookeeper)
     */
-  def stopAll(): Unit ={
+  def stopAll(): Unit = {
     kafkaNodes.foreach { ip =>
       ssh(ip, s"kafka/bin/kafka-server-stop.sh")
     }

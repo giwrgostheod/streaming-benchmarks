@@ -2,9 +2,9 @@ package uk.ac.ic.imperial.benchmark.yahoo
 
 import java.util.UUID
 
-import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.functions._
-import uk.ac.ic.imperial.benchmark.spark.LocalKafka
+import org.apache.spark.sql.{DataFrame, SparkSession}
+import uk.ac.ic.imperial.benchmark.utils.LocalKafka
 
 trait YahooBenchmarkRunner {
 
