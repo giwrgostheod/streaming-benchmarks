@@ -7,7 +7,8 @@ object SparkHelper {
   def getAndConfigureSparkSession() = {
     val conf = new SparkConf()
       .setAppName("Structured Streaming benchmark")
-      .setMaster("local[*]")
+      .setIfMissing("spark.master", "local[*]")
+//      .setMaster("local[*]")
 
     val sc = new SparkContext(conf)
     sc.setLogLevel("WARN")

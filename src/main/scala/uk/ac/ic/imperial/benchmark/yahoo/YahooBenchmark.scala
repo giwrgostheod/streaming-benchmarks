@@ -57,7 +57,20 @@ class YahooBenchmark(override val spark: SparkSession,
   override protected def saveResults(outputPath: String, trial: Int): Unit = {
     val throughput = runner.getThroughput()
     val latency = runner.getLatency()
-    throughput.crossJoin(latency).coalesce(1).write.mode("overwrite").json(outputPath.stripSuffix("/") + s"/trial=$trial")
+    /*throughput.crossJoin(latency).coalesce(1)
+    .write.mode("overwrite").json(outputPath.stripSuffix("/") + s"/trial=$trial")*/
+    
+    throughput.crossJoin(latency)
+    .coalesce(1)
+    .select(
+      'totalDurationMillis,
+      'latency_min,
+      'latency_95,
+      'latency_99,
+      'latency_max,
+      'latency_avg,
+      'throughput)
+    .show(truncate = false)
   }
 }
 

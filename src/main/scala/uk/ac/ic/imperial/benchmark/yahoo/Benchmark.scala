@@ -21,7 +21,7 @@ trait Benchmark[Runner <: YahooBenchmarkRunner] {
 
   var stoppedReader = false
 
-  protected val readerWaitTimeMs: Long = 300000 // 5 minutes
+  protected val readerWaitTimeMs: Long = 150000 // 5 minutes
 
   protected def init(): Unit = {
     if (readerThread != null) {

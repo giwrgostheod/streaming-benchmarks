@@ -155,102 +155,72 @@ object LocalKafka extends Serializable {
   private val configureKafkaScript =
     """#!/bin/bash
 set -e
-
 cd kafka
 cat > config/server.properties <<EOL
 ############################# Server Basics #############################
-
 # The id of the broker. This must be set to a unique integer for each broker.
 broker.id=$2
-
 ############################# Zookeeper #############################
-
 # Zookeeper connection string (see zookeeper docs for details).
 # This is a comma separated host:port pairs, each corresponding to a zk
 # server. e.g. "127.0.0.1:3000,127.0.0.1:3001,127.0.0.1:3002".
 # You can also append an optional chroot string to the urls to specify the
 # root directory for all kafka znodes.
 zookeeper.connect=$1:2181
-
 # Timeout in ms for connecting to zookeeper
 zookeeper.connection.timeout.ms=6000
-
 # Switch to enable topic deletion or not, default value is false
 delete.topic.enable=true
-
 auto.create.topics.enable=false
-
 ############################# Socket Server Settings #############################
-
 # The port the socket server listens on
 port=9092
-
 # Hostname the broker will bind to. If not set, the server will bind to all interfaces
 host.name=$3
-
 # Hostname the broker will advertise to producers and consumers. If not set, it uses the
 # value for "host.name" if configured.  Otherwise, it will use the value returned from
 # java.net.InetAddress.getCanonicalHostName().
 advertised.host.name=$3
-
 # The port to publish to ZooKeeper for clients to use. If this is not set,
 # it will publish the same port that the broker binds to.
 # advertised.port=9092
-
 # The number of threads handling network requests
 num.network.threads=3
-
 # The number of threads doing disk I/O
 num.io.threads=8
-
 # The send buffer (SO_SNDBUF) used by the socket server
 socket.send.buffer.bytes=102400
-
 # The receive buffer (SO_RCVBUF) used by the socket server
 socket.receive.buffer.bytes=102400
-
 # The maximum size of a request that the socket server will accept (protection against OOM)
 socket.request.max.bytes=104857600
-
 # Use kafka broker receive time in message timestamps, instead of creation time
 log.message.timestamp.type=LogAppendTime
-
 ############################# Log Basics #############################
-
 # A comma seperated list of directories under which to store log files
 log.dirs=/tmp/kafka-logs
-
 # The default number of log partitions per topic. More partitions allow greater
 # parallelism for consumption, but this will also result in more files across
 # the brokers.
 num.partitions=8
-
 # The number of threads per data directory to be used for log recovery at startup and flushing at shutdown.
 # This value is recommended to be increased for installations with data dirs located in RAID array.
 num.recovery.threads.per.data.dir=1
-
-
 ############################# Log Retention Policy #############################
-
 # The following configurations control the disposal of log segments. The policy can
 # be set to delete segments after a period of time, or after a given size has accumulated.
 # A segment will be deleted whenever *either* of these criteria are met. Deletion always happens
 # from the end of the log.
-
 # The minimum age of a log file to be eligible for deletion
 log.retention.hours=168
-
 # The maximum size of a log segment file. When this size is reached a new log segment will be created.
 log.segment.bytes=1073741824
-
 # The interval at which log segments are checked to see if they can be deleted according
 # to the retention policies
 log.retention.check.interval.ms=300000
-
 # By default the log cleaner is disabled and the log retention policy will default to just delete segments after their retention expires.
 # If log.cleaner.enable=true is set the cleaner will be enabled and individual logs can then be marked for log compaction.
 log.cleaner.enable=false
-
 EOL
     """
 }
