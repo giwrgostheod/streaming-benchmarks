@@ -2,3 +2,7 @@
 /flink/
 /spark-warehouse/
 .idea/
+.settings/
+.cache-main
+.classpath
+.project
