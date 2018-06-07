@@ -1,3 +1,4 @@
 /target/
 /flink/
 /spark-warehouse/
+.idea/

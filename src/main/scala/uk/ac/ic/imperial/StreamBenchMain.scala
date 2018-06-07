@@ -29,9 +29,9 @@ object StreamBenchMain {
   //////////////////////////////////
   // Event Generation
   //////////////////////////////////
-  var recordsPerSecond = 7000000
+  var recordsPerSecond = 2000000
   val rampUpTimeSeconds = 10 // Ramps up event generation to the specified rate for the given duration to allow the JVM to warm up
-  var recordGenerationParallelism = 128 // Parallelism within Spark to generate data for the Kafka Streams benchmark
+  var recordGenerationParallelism = 1 // Parallelism within Spark to generate data for the Kafka Streams benchmark
 
   val numCampaigns = 100 // The number of campaigns to generate events for. Configures the cardinality of the state that needs to be updated
 
@@ -61,7 +61,7 @@ object StreamBenchMain {
   //////////////////////////////////
   // Spark
   //////////////////////////////////
-  var sparkParallelism = 240
+  var sparkParallelism = 1
 
   /////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////////////////////////////
